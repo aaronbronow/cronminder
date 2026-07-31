@@ -7,7 +7,6 @@ set -euo pipefail
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/cronminder"
 STATE_FILE="$CONFIG_DIR/state"
-LEGACY_STATE_FILE="$HOME/.last_backup_week"
 TASKS_DIR="$CONFIG_DIR/tasks.d"
 TASKS_CONF="$CONFIG_DIR/tasks.conf"
 LEGACY_CONF="$HOME/.cronminder.conf"
@@ -60,18 +59,9 @@ get_period_key() {
 # ------------------------------------------------------------------------------
 get_task_state() {
     local task_id="$1"
-    local val=""
-
     if [[ -f "$STATE_FILE" ]]; then
-        val=$(grep "^${task_id}=" "$STATE_FILE" 2>/dev/null | head -n1 | cut -d'=' -f2- || true)
+        grep "^${task_id}=" "$STATE_FILE" 2>/dev/null | head -n1 | cut -d'=' -f2- || true
     fi
-
-    # Migration fallback for legacy state file if task_id matches legacy file
-    if [[ -z "$val" && -f "$LEGACY_STATE_FILE" && ("$task_id" == "backup" || "$task_id" == "weekly") ]]; then
-        val=$(cat "$LEGACY_STATE_FILE" 2>/dev/null || true)
-    fi
-
-    echo "$val"
 }
 
 set_task_state() {
@@ -88,22 +78,18 @@ set_task_state() {
     fi
     echo "${task_id}=${period_key}" >> "$tmp_file"
     mv "$tmp_file" "$STATE_FILE"
-
-    # Sync legacy file if task is backup or weekly
-    if [[ "$task_id" == "backup" || "$task_id" == "weekly" ]]; then
-        echo "$period_key" > "$LEGACY_STATE_FILE"
-    fi
 }
 
 remove_task_state() {
     local task_id="$1"
     if [[ -f "$STATE_FILE" ]]; then
-        local tmp_file="${STATE_FILE}.tmp"
-        grep -v "^${task_id}=" "$STATE_FILE" > "$tmp_file" 2>/dev/null || true
-        mv "$tmp_file" "$STATE_FILE"
-    fi
-    if [[ "$task_id" == "backup" || "$task_id" == "weekly" || "$task_id" == "all" ]]; then
-        rm -f "$LEGACY_STATE_FILE"
+        if [[ "$task_id" == "all" || -z "$task_id" ]]; then
+            rm -f "$STATE_FILE"
+        else
+            local tmp_file="${STATE_FILE}.tmp"
+            grep -v "^${task_id}=" "$STATE_FILE" > "$tmp_file" 2>/dev/null || true
+            mv "$tmp_file" "$STATE_FILE"
+        fi
     fi
 }
 
@@ -519,12 +505,11 @@ cmd_done() {
 
 cmd_reset() {
     local target_id="${1:-}"
+    remove_task_state "${target_id:-all}"
     if [[ -n "$target_id" && "$target_id" != "all" ]]; then
-        remove_task_state "$target_id"
         echo -e "\033[1;33m✓ State for task '$target_id' removed.\033[0m"
     else
-        rm -f "$STATE_FILE" "$LEGACY_STATE_FILE"
-        echo -e "\033[1;33m✓ All state files removed. Reminders will trigger on next check.\033[0m"
+        echo -e "\033[1;33m✓ State file removed. Reminders will trigger on next check.\033[0m"
     fi
 }
 
