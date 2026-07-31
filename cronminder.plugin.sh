@@ -1,5 +1,5 @@
 # Generic Bash / POSIX Shell Plugin Loader for cronminder
-# Version: 1.0.0
+# Version: 2.0.0
 
 _CRONMINDER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
 
@@ -15,7 +15,7 @@ cronminder() {
 cronminder_check() {
     local script_path="$_CRONMINDER_DIR/cronminder"
     if [ -f "$script_path" ]; then
-        "$script_path" check
+        "$script_path" check "$@"
     fi
 }
 

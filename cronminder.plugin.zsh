@@ -1,6 +1,6 @@
 # Oh My Zsh Plugin: cronminder
-# Stateful scheduled task and backup reminders for Zsh / Oh My Zsh
-# Version: 1.0.0
+# Declarative stateful task and backup reminders for Zsh / Oh My Zsh
+# Version: 2.0.0
 
 _CRONMINDER_DIR="${${(%):-%x}:A:h}"
 
@@ -16,7 +16,7 @@ function cronminder() {
 function cronminder_check() {
     local script_path="$_CRONMINDER_DIR/cronminder"
     if [[ -f "$script_path" && -o interactive ]]; then
-        "$script_path" check
+        "$script_path" check "$@"
     fi
 }
 
