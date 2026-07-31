@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Installer script for cronminder plugin
+# Usage: curl -sSL https://raw.githubusercontent.com/aaronbronow/cronminder/main/install.sh | bash
 set -euo pipefail
 
 # Text colors

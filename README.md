@@ -23,12 +23,18 @@ cronminder test    # Force display reminder banner for testing
 
 ## Installation
 
-### Oh My Zsh
-
-Symlink the project into your Oh My Zsh custom plugins directory:
+### Option 1: Quick Install via Curl
 
 ```bash
-ln -s ~/dev/cronminder ~/.oh-my-zsh/custom/plugins/cronminder
+curl -sSL https://raw.githubusercontent.com/aaronbronow/cronminder/main/install.sh | bash
+```
+
+### Option 2: Oh My Zsh Custom Plugin
+
+Clone the repository into your Oh My Zsh custom plugins folder:
+
+```bash
+git clone https://github.com/aaronbronow/cronminder.git ~/.oh-my-zsh/custom/plugins/cronminder
 ```
 
 Then enable `cronminder` in your `~/.zshrc`:
