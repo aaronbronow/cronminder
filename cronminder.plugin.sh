@@ -20,6 +20,6 @@ cronminder_check() {
 }
 
 if [ -z "${_CRONMINDER_RAN:-}" ]; then
-    export _CRONMINDER_RAN=1
+    _CRONMINDER_RAN=1
     cronminder_check
 fi

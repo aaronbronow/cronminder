@@ -20,8 +20,8 @@ function cronminder_check() {
     fi
 }
 
-# Run check once per shell session if interactive
+# Run check once per shell session if interactive (unexported to allow subshells/new tabs to run)
 if [[ -z "$_CRONMINDER_RAN" ]]; then
-    export _CRONMINDER_RAN=1
+    _CRONMINDER_RAN=1
     cronminder_check
 fi
