@@ -60,7 +60,7 @@ get_period_key() {
 get_task_state() {
     local task_id="$1"
     if [[ -f "$STATE_FILE" ]]; then
-        grep "^${task_id}=" "$STATE_FILE" 2>/dev/null | head -n1 | cut -d'=' -f2- || true
+        grep "^${task_id}=" "$STATE_FILE" 2>/dev/null | tail -n1 | cut -d'=' -f2- || true
     fi
 }
 
