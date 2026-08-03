@@ -2,7 +2,7 @@
 # Declarative stateful task and backup reminders for Zsh / Oh My Zsh
 # Version: 2.0.0
 
-_CRONMINDER_DIR="${${(%):-%x}:A:h}"
+_CRONMINDER_DIR="${${(%):-%x}:a:h}"
 
 function cronminder() {
     local script_path="$_CRONMINDER_DIR/cronminder"
