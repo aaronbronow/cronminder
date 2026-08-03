@@ -26,13 +26,37 @@ else
     IS_OMZ=false
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Determine if we have the local repository files or if we need to clone
+HAS_LOCAL_FILES=false
+SCRIPT_DIR=""
 
-if [ "$PLUGIN_DIR" != "$SCRIPT_DIR" ]; then
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "$SCRIPT_DIR/cronminder" ] && [ -f "$SCRIPT_DIR/cronminder.plugin.zsh" ]; then
+        HAS_LOCAL_FILES=true
+    fi
+fi
+
+if [ "$HAS_LOCAL_FILES" = false ]; then
+    if [ -f "./cronminder" ] && [ -f "./cronminder.plugin.zsh" ]; then
+        SCRIPT_DIR="$(pwd)"
+        HAS_LOCAL_FILES=true
+    fi
+fi
+
+if [ "$HAS_LOCAL_FILES" = true ]; then
+    if [ "$PLUGIN_DIR" != "$SCRIPT_DIR" ]; then
+        mkdir -p "$(dirname "$PLUGIN_DIR")"
+        rm -rf "$PLUGIN_DIR"
+        ln -s "$SCRIPT_DIR" "$PLUGIN_DIR"
+        echo -e "${GREEN}✓ Created symlink: $PLUGIN_DIR -> $SCRIPT_DIR${NC}"
+    fi
+else
+    echo -e "${BLUE}⚡ Cloning cronminder repository to $PLUGIN_DIR...${NC}"
     mkdir -p "$(dirname "$PLUGIN_DIR")"
     rm -rf "$PLUGIN_DIR"
-    ln -s "$SCRIPT_DIR" "$PLUGIN_DIR"
-    echo -e "${GREEN}✓ Created symlink: $PLUGIN_DIR -> $SCRIPT_DIR${NC}"
+    git clone https://github.com/aaronbronow/cronminder.git "$PLUGIN_DIR"
+    echo -e "${GREEN}✓ Cloned repository successfully!${NC}"
 fi
 
 RC_FILE="$HOME/.zshrc"
